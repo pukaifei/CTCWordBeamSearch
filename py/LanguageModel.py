@@ -9,13 +9,18 @@ from PrefixTree import PrefixTree
 class LanguageModel:
     "unigram/bigram LM, add-k smoothing"
 
+    # corpus 语料
+    # chars　所有的字符
+    # wordChars　单词的字符
     def __init__(self, corpus, chars, wordChars):
         "read text from filename, specify chars which are contained in dataset, specify chars which form words"
         # read from file
         self.wordCharPattern = '[' + wordChars + ']'
         self.wordPattern = self.wordCharPattern + '+'
         words = re.findall(self.wordPattern, corpus)
+        print("words: " + str(words))
         uniqueWords = list(set(words))  # make unique
+        print("uniqueWords: " + str(uniqueWords))
         self.numWords = len(words)
         self.numUniqueWords = len(uniqueWords)
         self.smoothing = True

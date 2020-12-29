@@ -11,7 +11,7 @@ from WordBeamSearch import wordBeamSearch
 # Settings
 sampleEach = 1
 dataset = 'bentham'
-useNGrams = True
+useNGrams = False 
 
 # main
 if __name__ == '__main__':
@@ -45,3 +45,4 @@ if __name__ == '__main__':
 
         # output to csv
         csv.write([res, data.gt, strEditDist])
+        break

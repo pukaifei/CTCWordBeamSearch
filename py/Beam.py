@@ -61,6 +61,7 @@ class Beam:
         return self.lm.getNextChars(self.textual.wordDev)
 
     def createChildBeam(self, newChar, prBlank, prNonBlank):
+        # newChar可能为空
         "extend beam by new character and set optical score"
         beam = Beam(self.lm, self.useNGrams)
 
@@ -78,6 +79,9 @@ class Beam:
                     nextWords = beam.lm.getNextWords(beam.textual.wordDev)
 
                     # no complete word in text, then use unigram of all possible next words
+                    # 找到以wordDev前缀的单词，计算语言模型分
+                    # 前面无完整的单词，计算所有以此为前缀的词的概率和，用一阶语言模型
+                    # 前面有完整的单词，用二阶语言模型
                     numWords = len(beam.textual.wordHist)
                     prSum = 0
                     if numWords == 0:
@@ -88,13 +92,15 @@ class Beam:
                         lastWord = beam.textual.wordHist[-1]
                         for w in nextWords:
                             prSum += beam.lm.getBigramProb(lastWord, w)
+
                     beam.textual.prTotal = beam.textual.prUnnormalized * prSum
-                    beam.textual.prTotal = beam.textual.prTotal ** (
-                            1 / (numWords + 1)) if numWords >= 1 else beam.textual.prTotal
+                    beam.textual.prTotal = beam.textual.prTotal ** ( 1 / (numWords + 1)) if numWords >= 1 else beam.textual.prTotal
 
                 # if new char does not occur inside a word
                 else:
                     # if current word is not empty, add it to history
+                    # 如果new char是构成word的字符，wordHist加上wordDev里的多个char
+                    # 因为是手写字识别，可能出现标点符号等，或者单词漏个字母的情况
                     if beam.textual.wordDev != '':
                         beam.textual.wordHist.append(beam.textual.wordDev)
                         beam.textual.wordDev = ''
@@ -110,6 +116,7 @@ class Beam:
                             beam.textual.prTotal = beam.textual.prUnnormalized ** (1 / numWords)
 
             else:  # don't use unigrams and bigrams, just keep wordDev up to date
+                # 不使用语言模型，则textual的text和wordDev都是新的字符
                 if newChar in beam.lm.getWordChars():
                     beam.textual.wordDev += newChar
                 else:

@@ -6,6 +6,8 @@ import numpy as np
 from Beam import Beam, BeamList
 from LanguageModel import LanguageModel
 
+import sys
+
 
 def wordBeamSearch(mat, beamWidth, lm, useNGrams):
     "decode matrix, use given beam width and language model"
@@ -21,6 +23,7 @@ def wordBeamSearch(mat, beamWidth, lm, useNGrams):
     last = BeamList()  # list of beams at time-step before beginning of RNN output
     last.addBeam(genesisBeam)  # start with genesis beam
 
+
     # go over all time-steps
     for t in range(maxT):
         # curr在当前时刻清零，旧的保存在last中
@@ -28,6 +31,11 @@ def wordBeamSearch(mat, beamWidth, lm, useNGrams):
 
         # go over best beams
         bestBeams = last.getBestBeams(beamWidth)  # get best beams
+        for beam in bestBeams:
+            sys.stdout.write("%d\t"%t)
+            sys.stdout.write("%10s %s\t"%(beam.textual.wordDev, beam.textual.wordHist))
+            sys.stdout.write("%.6f\n"%beam.getPrTotal())
+
         for beam in bestBeams:
             # print("\n")
             # calc probability that beam ends with non-blank
@@ -72,6 +80,7 @@ def wordBeamSearch(mat, beamWidth, lm, useNGrams):
     # return most probable beam
     last.completeBeams(lm)
     bestBeams = last.getBestBeams(1)  # sort by probability
+    print(bestBeams[0].getPrTotal())
     return bestBeams[0].getText()
 
 

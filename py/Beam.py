@@ -99,9 +99,11 @@ class Beam:
                 # if new char does not occur inside a word
                 else:
                     # if current word is not empty, add it to history
-                    # 如果new char是构成word的字符，wordHist加上wordDev里的多个char
+                    # 如果遇到非word字符（即标点符号、数字、空格等），即单词到末尾了
+                    # 把当前的wordDev更新到单词列表wordHist中
                     # 因为是手写字识别，可能出现标点符号等，或者单词漏个字母的情况
                     if beam.textual.wordDev != '':
+                        print("newChar:", newChar, "wordDev:", beam.textual.wordDev)
                         beam.textual.wordHist.append(beam.textual.wordDev)
                         beam.textual.wordDev = ''
 
@@ -125,6 +127,7 @@ class Beam:
         # set optical information
         beam.optical.prBlank = prBlank
         beam.optical.prNonBlank = prNonBlank
+        # print(beam.textual.wordDev, "   ", beam.textual.wordHist)
         return beam
 
     def __str__(self):
